@@ -28,6 +28,9 @@ func GetExifOrientation(img io.ReadCloser) (*ExifOrientation, error) {
 	}
 
 	rawValue, err := exifData.Get(exif.Orientation)
+	if exif.IsTagNotPresentError(err) {
+		return nil, nil
+	}
 	if err != nil {
 		return nil, errors.New("exif: error getting orientation: " + err.Error())
 	}
@@ -35,6 +38,11 @@ func GetExifOrientation(img io.ReadCloser) (*ExifOrientation, error) {
 	orientation, err := rawValue.Int(0)
 	if err != nil {
 		return nil, errors.New("exif: error parsing orientation: " + err.Error())
+	}
+
+	// Some devices produce invalid exif data when they intend to mean "no orientation"
+	if orientation == 0 {
+		return nil, nil
 	}
 
 	if orientation < 1 || orientation > 8 {

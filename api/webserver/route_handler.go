@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"mime"
 	"net"
 	"net/http"
 	"net/url"
@@ -122,9 +123,6 @@ func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case *api.DoNotCacheResponse:
 		res = result.Payload
 		break
-	default:
-		w.Header().Set("Cache-Control", "public,max-age=86400,s-maxage=86400")
-		break
 	}
 
 	htmlRes, isHtml := res.(*api.HtmlResponse)
@@ -153,6 +151,9 @@ func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		case common.ErrCodeMethodNotAllowed:
 			statusCode = http.StatusMethodNotAllowed
 			break
+		case common.ErrCodeForbidden:
+			statusCode = http.StatusForbidden
+			break
 		default: // Treat as unknown (a generic server error)
 			statusCode = http.StatusInternalServerError
 			break
@@ -171,12 +172,37 @@ func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if result.SizeBytes > 0 {
 			w.Header().Set("Content-Length", fmt.Sprint(result.SizeBytes))
 		}
-		if result.Filename != "" {
-			if is.ASCII(result.Filename) {
-				w.Header().Set("Content-Disposition", "inline; filename="+url.QueryEscape(result.Filename))
+		disposition := result.TargetDisposition
+		if disposition == "" {
+			disposition = "inline"
+		} else if disposition == "infer" {
+			if result.ContentType == "" {
+				disposition = "attachment"
 			} else {
-				w.Header().Set("Content-Disposition", "inline; filename*=utf-8''"+url.QueryEscape(result.Filename))
+				if util.HasAnyPrefix(result.ContentType, []string{"image/", "audio/", "video/"}) {
+					disposition = "inline"
+				} else {
+					disposition = "attachment"
+				}
 			}
+		}
+		fname := result.Filename
+		if fname == "" {
+			exts, err := mime.ExtensionsByType(result.ContentType)
+			if err != nil {
+				exts = nil
+				contextLog.Warn("Unexpected error inferring file extension: " + err.Error())
+			}
+			ext := ""
+			if exts != nil && len(exts) > 0 {
+				ext = exts[0]
+			}
+			fname = "file" + ext
+		}
+		if is.ASCII(result.Filename) {
+			w.Header().Set("Content-Disposition", disposition+"; filename="+url.QueryEscape(fname))
+		} else {
+			w.Header().Set("Content-Disposition", disposition+"; filename*=utf-8''"+url.QueryEscape(fname))
 		}
 		defer result.Data.Close()
 		writeResponseData(w, result.Data, result.SizeBytes)
@@ -199,6 +225,7 @@ func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			"method":     r.Method,
 			"statusCode": strconv.Itoa(http.StatusOK),
 		}).Inc()
+		w.Header().Set("Cache-Control", "private, max-age=259200") // 3 days
 		w.Header().Set("Content-Type", "text/html; charset=UTF-8")
 		w.Header().Set("Content-Security-Policy", "") // We're serving HTML, so take away the CSP
 		io.Copy(w, bytes.NewBuffer([]byte(result.HTML)))

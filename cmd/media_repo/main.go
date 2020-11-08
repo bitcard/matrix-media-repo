@@ -21,6 +21,7 @@ func main() {
 	configPath := flag.String("config", "media-repo.yaml", "The path to the configuration")
 	migrationsPath := flag.String("migrations", config.DefaultMigrationsPath, "The absolute path for the migrations folder")
 	templatesPath := flag.String("templates", config.DefaultTemplatesPath, "The absolute path for the templates folder")
+	assetsPath := flag.String("assets", config.DefaultAssetsPath, "The absolute path for the assets folder")
 	versionFlag := flag.Bool("version", false, "Prints the version and exits")
 	flag.Parse()
 
@@ -36,7 +37,9 @@ func main() {
 	}
 
 	config.Path = *configPath
-	assets.SetupTemplatesAndMigrations(*migrationsPath, *templatesPath)
+	assets.SetupMigrations(*migrationsPath)
+	assets.SetupTemplates(*templatesPath)
+	assets.SetupAssets(*assetsPath)
 
 	err := logging.Setup(config.Get().General.LogDirectory)
 	if err != nil {

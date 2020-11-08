@@ -6,10 +6,21 @@ type ArchivingConfig struct {
 	TargetBytesPerPart int64 `yaml:"targetBytesPerPart"`
 }
 
+type QuotaUserConfig struct {
+	Glob     string `yaml:"glob"`
+	MaxBytes int64  `yaml:"maxBytes"`
+}
+
+type QuotasConfig struct {
+	Enabled    bool              `yaml:"enabled"`
+	UserQuotas []QuotaUserConfig `yaml:"users,flow"`
+}
+
 type UploadsConfig struct {
-	MaxSizeBytes         int64 `yaml:"maxBytes"`
-	MinSizeBytes         int64 `yaml:"minBytes"`
-	ReportedMaxSizeBytes int64 `yaml:"reportedMaxBytes"`
+	MaxSizeBytes         int64        `yaml:"maxBytes"`
+	MinSizeBytes         int64        `yaml:"minBytes"`
+	ReportedMaxSizeBytes int64        `yaml:"reportedMaxBytes"`
+	Quota                QuotasConfig `yaml:"quotas"`
 }
 
 type DatastoreConfig struct {
@@ -29,6 +40,7 @@ type ThumbnailsConfig struct {
 	Types               []string        `yaml:"types,flow"`
 	MaxAnimateSizeBytes int64           `yaml:"maxAnimateSizeBytes"`
 	Sizes               []ThumbnailSize `yaml:"sizes,flow"`
+	DynamicSizing       bool            `yaml:"dynamicSizing"`
 	AllowAnimated       bool            `yaml:"allowAnimated"`
 	DefaultAnimated     bool            `yaml:"defaultAnimated"`
 	StillFrame          float32         `yaml:"stillFrame"`
@@ -51,6 +63,7 @@ type UrlPreviewsConfig struct {
 	AllowedNetworks    []string `yaml:"allowedNetworks,flow"`
 	UnsafeCertificates bool     `yaml:"previewUnsafeCertificates"`
 	DefaultLanguage    string   `yaml:"defaultLanguage"`
+	OEmbed             bool     `yaml:"oEmbed"`
 }
 
 type IdenticonsConfig struct {

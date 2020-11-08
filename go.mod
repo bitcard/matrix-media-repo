@@ -12,15 +12,19 @@ require (
 	github.com/buckket/go-blurhash v1.0.3
 	github.com/cenk/backoff v2.2.1+incompatible // indirect
 	github.com/cupcake/sigil v0.0.0-20131127230922-6bf9722f2ae8
+	github.com/dhowden/tag v0.0.0-20200412032933-5d76b8eaae27
 	github.com/didip/tollbooth v4.0.2+incompatible
 	github.com/disintegration/imaging v1.6.2
 	github.com/djherbis/stream v1.3.0
 	github.com/dustin/go-humanize v1.0.0
+	github.com/dyatlov/go-oembed v0.0.0-20191103150536-a57c85b3b37c
 	github.com/dyatlov/go-opengraph v0.0.0-20180429202543-816b6608b3c8
 	github.com/facebookgo/clock v0.0.0-20150410010913-600d898af40a // indirect
+	github.com/faiface/beep v1.0.2
 	github.com/fastly/go-utils v0.0.0-20180712184237-d95a45783239 // indirect
 	github.com/fogleman/gg v1.3.0
 	github.com/fsnotify/fsnotify v1.4.7
+	github.com/gabriel-vasile/mimetype v1.1.1
 	github.com/go-redis/redis/v8 v8.0.0-beta.6
 	github.com/go-sql-driver/mysql v1.5.0 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
@@ -50,13 +54,14 @@ require (
 	github.com/rubyist/circuitbreaker v2.2.1+incompatible
 	github.com/rwcarlsen/goexif v0.0.0-20190401172101-9e8deecbddbd
 	github.com/ryanuber/go-glob v1.0.0
+	github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca
 	github.com/sebest/xff v0.0.0-20160910043805-6c115e0ffa35
 	github.com/sirupsen/logrus v1.4.2
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/tebeka/strftime v0.1.3 // indirect
 	golang.org/x/crypto v0.0.0-20200323165209-0ec3e9974c59
 	golang.org/x/image v0.0.0-20200119044424-58c23975cae1
-	golang.org/x/net v0.0.0-20200513185701-a91f0712d120 // indirect
+	golang.org/x/net v0.0.0-20200513185701-a91f0712d120
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
 	gopkg.in/ini.v1 v1.52.0 // indirect
 	gopkg.in/yaml.v2 v2.2.8

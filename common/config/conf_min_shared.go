@@ -23,6 +23,10 @@ func NewDefaultMinimumRepoConfig() MinimumRepoConfig {
 			MaxSizeBytes:         104857600, // 100mb
 			MinSizeBytes:         100,
 			ReportedMaxSizeBytes: 0,
+			Quota: QuotasConfig{
+				Enabled:    false,
+				UserQuotas: []QuotaUserConfig{},
+			},
 		},
 		Identicons: IdenticonsConfig{
 			Enabled: true,
@@ -58,7 +62,7 @@ func NewDefaultMinimumRepoConfig() MinimumRepoConfig {
 			},
 			Redis: RedisConfig{
 				Enabled: false,
-				Shards: []RedisShardConfig{},
+				Shards:  []RedisShardConfig{},
 			},
 		},
 		AccessTokens: AccessTokenConfig{

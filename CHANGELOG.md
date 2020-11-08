@@ -7,16 +7,61 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+*Nothing yet.*
+
+## [1.2.1] - October 27th, 2020
+
+### Added
+
+* Added a new tool, `export_synapse_for_import`, which can be used to do an offline import from Synapse.
+  * After running this tool, use the `gdpr_import` tool to bring the export into the media repo.
+* Added thumbnailing support for some audio waveforms (MP3, WAV, OGG, and FLAC).
+* Added audio metadata (duration, etc) to the unstable `/info` endpoint. Aligns with [MSC2380](https://github.com/matrix-org/matrix-doc/pull/2380).
+* Added simple thumbnailing for MP4 videos.
+* Added an `asAttachment` query parameter to download requests per [MSC2702](https://github.com/matrix-org/matrix-doc/pull/2702).
+
+### Fixed
+
+* Fixed thumbnails for invalid JPEGs.
+* Fixed incorrect metrics being published when using the Redis cache.
+* Fixed errors generating thumbnails when bad EXIF headers were provided.
+* Use `r0` instead of `v1` for federation requests. No changes should be needed to configurations or routing - it'll just work.
+
+## [1.2.0] - August 2nd, 2020
+
+### Upgrade notes
+
+**This release contains a database change which might take a while.** In order to support quotas, this
+release tracks how much a user has uploaded, which might take a while to initially calculate. If you have
+a large database (more than about 100k uploaded files), run the following steps before upgrading:
+
+1. The PostgreSQL script described [here](https://github.com/turt2live/matrix-media-repo/blob/a8951b0562debb9f8ae3b6e517bfc3a84d2e627a/migrations/17_add_user_stats_table_up.sql).
+   This can be run while the server is running.
+2. If you have no intention of using stats or quotas, you're done (the stats table will be inaccurate). If
+   you do plan on using either, run `INSERT INTO user_stats SELECT user_id, SUM(size_bytes) FROM media GROUP BY user_id;`
+   which may take a while.
+3. Change the owner of the table and function to your media repo's postgresql user. For example, if your postgres
+   user is `media`, then run:
+   ```sql
+   ALTER TABLE user_stats OWNER TO media;
+   ALTER FUNCTION track_update_user_media() OWNER TO media; 
+   ```
+
 ### Added
 
 * Add webp image support. Thanks @Sorunome!
 * Add apng image support. Thanks @Sorunome!
 * Experimental support for Redis as a cache (in preparation for proper load balancing/HA support).
+* Added oEmbed URL preview support.
+* Added support for dynamic thumbnails.
+* Added a way to prevent certain media from being quarantined (attributes API).
+* Added support for quotas.
 
 ### Changed
 
 * Remove deprecated support for restricting uploads to certain mime types.
 * Remove deprecated support for `forUploads`.
+* Clarified what `uploads.minBytes` is intended to be used for.
 
 ### Fixed
 
@@ -27,6 +72,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 * Fixed incorrect HTTP status codes for bad thumbnail requests.
 * Fixed dimension checking on thumbnails.
 * Fixed handling of EXIF metadata. Thanks @sorunome!
+* Fixed handling of URL previews for some encodings.
+* Fixed `Cache-Control` headers being present on errors.
 
 ## [1.1.3] - July 15th, 2020
 
@@ -148,7 +195,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 * Various other features that would be expected like maximum/minimum size controls, rate limiting, etc. Check out the
   sample config for a better idea of what else is possible.
 
-[unreleased]: https://github.com/turt2live/matrix-media-repo/compare/v1.1.3...HEAD
+[unreleased]: https://github.com/turt2live/matrix-media-repo/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/turt2live/matrix-media-repo/compare/v1.2.0...v1.2.1
+[1.2.0]: https://github.com/turt2live/matrix-media-repo/compare/v1.1.3...v1.2.0
 [1.1.3]: https://github.com/turt2live/matrix-media-repo/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/turt2live/matrix-media-repo/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/turt2live/matrix-media-repo/compare/v1.1.0...v1.1.1

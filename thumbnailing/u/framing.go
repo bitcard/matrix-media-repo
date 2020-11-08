@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 
 	"github.com/disintegration/imaging"
+	"github.com/sirupsen/logrus"
 	"github.com/turt2live/matrix-media-repo/util/util_exif"
 )
 
@@ -25,7 +26,9 @@ func MakeThumbnail(src image.Image, method string, width int, height int) (image
 func IdentifyAndApplyOrientation(origBytes []byte, src image.Image) (image.Image, error) {
 	orientation, err := util_exif.GetExifOrientation(ioutil.NopCloser(bytes.NewBuffer(origBytes)))
 	if err != nil {
-		return nil, err
+		// assume no orientation if there was an error reading the exif header
+		logrus.Warn("Non-fatal error reading exif headers:", err.Error())
+		orientation = nil
 	}
 
 	result := src
